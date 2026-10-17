@@ -1,12 +1,11 @@
 using System;
 using UnityEngine;
 
-//这是池塘类的界面部分；改标题、说明、颜色和按钮时只看这个文件。
 public partial class TidepoolEvolution
 {
     GUIStyle title, heading, label, small, button, welcomeTitle, foodArrow, startButton, endMessage;
     Texture2D pixel, buttonNormal, buttonHover, buttonPressed;
-    //下面只负责显示界面，不改变生物的行为。
+    
     void Styles()
     {
         if (pixel != null) return;

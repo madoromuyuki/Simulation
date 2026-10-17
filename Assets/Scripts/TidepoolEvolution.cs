@@ -141,7 +141,7 @@ public partial class TidepoolEvolution : MonoBehaviour
         births++;
         return true;
     }
-    //重开时移除旧对象，再生成一池新生物；游戏不保存或读取进度。
+    //regenerate orgs when restart
     void Restart()
     {
         foreach (var root in new[] { organismRoot, nutrientRoot })
@@ -155,7 +155,7 @@ public partial class TidepoolEvolution : MonoBehaviour
         oxygen = 80;
         rate = 1;
         paused = help = gameOver = false;
-        int[] startingCounts = { 36, 14, 4 }; //依次为藻类、虾、鱼的开局数量。
+        int[] startingCounts = { 36, 14, 4 }; //#of algae, shrimp, fish
         for (int species = 0; species < startingCounts.Length; species++)
             for (int count = 0; count < startingCounts[species]; count++)
                 CreateOrganism((Species)species, new Vector3(UnityEngine.Random.Range(Left + 1, Right - 1), UnityEngine.Random.Range(Bottom + 1, Top - 1), 0));

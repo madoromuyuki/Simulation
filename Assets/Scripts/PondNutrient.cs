@@ -1,6 +1,5 @@
 using UnityEngine;
 
-//营养会一直保留，直到附近的藻类成功吸收。
 public class PondNutrient : MonoBehaviour
 {
     public float remaining = 55;

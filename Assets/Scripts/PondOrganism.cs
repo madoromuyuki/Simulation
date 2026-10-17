@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 
-//每个生物独立运行，负责进食、大小、寿命和移动。
+//eat, size, move
 public partial class PondOrganism : MonoBehaviour
 {
     public TidepoolEvolution.Species species;
@@ -9,7 +9,7 @@ public partial class PondOrganism : MonoBehaviour
     public float age;
     public float energy = 60;
     public float lifespan;
-    //所有数组都按藻类、虾、鱼排列；大小按小、中、大排列。
+    //algae, shrimp, fish; small, middle, big
     static readonly float[] Lifespans = { 20, 45, 90 };
     static readonly float[] EnergyCosts = { .3f, .28f, .38f };
     static readonly float[] SizeScales = { .5f, .75f, 1 };
@@ -100,11 +100,11 @@ public partial class PondOrganism : MonoBehaviour
 
         if (age >= lifespan || energy <= 0)
         {
-            Die(age < lifespan); //寿命到期直接消失，其他死亡仍可能留下营养。
+            Die(age < lifespan); 
             return;
         }
 
-        //每两秒换一次自由游动方向。
+        //change swimming direction every 2s
         turnTimer += deltaTime;
         if (turnTimer > 2)
         {
@@ -123,10 +123,10 @@ public partial class PondOrganism : MonoBehaviour
             transform.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
     }
 
-    //藻类找营养并分裂；虾啃食藻类；鱼捕食虾。
+    //algae finds nutri, shrimp finds algae; fish finds shrimp
     void AlgaeBehaviour()
     {
-        speed = .24f; //藻类平时的游速。
+        speed = .24f; //algae move speed
         state = TidepoolEvolution.State.Drifting;
         if (pond.Light < .23f)
         {
@@ -147,7 +147,7 @@ public partial class PondOrganism : MonoBehaviour
         }
         if (target == null) return;
         direction = (target.position - transform.position).normalized;
-        speed = .48f; //藻类靠近营养时的游速。
+        speed = .48f; //algae speed towards nutri
         if (nearest > CollisionRadius + .12f) return;
         var nutrient = target.GetComponent<PondNutrient>();
         if (nutrient == null) return;
@@ -158,7 +158,7 @@ public partial class PondOrganism : MonoBehaviour
     void ShrimpBehaviour()
     {
         wallEscapeTimer -= deltaTime;
-        //速度一快一慢，让虾呈现短促的跳动。
+        //speed changes
         speed = .6f + Mathf.Sin(pond.Elapsed * 8) * .25f;
         state = TidepoolEvolution.State.Feeding;
         PondOrganism fish = energy > 25 ? FindNearby(TidepoolEvolution.Species.Fish, 1.2f) : null;
@@ -203,7 +203,7 @@ public partial class PondOrganism : MonoBehaviour
             TryHaveBaby();
             return;
         }
-        //保留最后三只虾；鱼不反复追逐无法吃掉的目标。
+        //make fish dumb
         if (pond.Count(TidepoolEvolution.Species.Shrimp) <= 3) return;
         PondOrganism shrimp = FindNearby(TidepoolEvolution.Species.Shrimp, 4);
         if (shrimp == null) return;
@@ -244,7 +244,7 @@ public partial class PondOrganism : MonoBehaviour
             food.Die();
         }
         energy = Mathf.Min(120, energy + 35);
-        age = 0; //只有真正吃到食物，才刷新寿命并长大一级。
+        age = 0; 
         SetAnimalLevel(animalLevel + 1);
     }
 

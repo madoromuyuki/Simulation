@@ -1,17 +1,18 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 
-//这是生物类的移动部分；分散、眼睛、边界和碰撞都在这里。
+//spread, eyes and collison
 public partial class PondOrganism
 {
-    //身体和眼睛作为整体绘制，防止重叠时眼睛跑到别的生物身上。
+    //body and eyes as a whole part
     void ConfigureVisuals()
     {
         visualGroup = GetComponent<SortingGroup>();
         if (visualGroup == null) visualGroup = gameObject.AddComponent<SortingGroup>();
         visualGroup.sortingLayerID = body.sortingLayerID;
         UpdateVisualDepth();
-        //记录身体大小；实际碰撞由下面的移动方法处理。
+
+        //body size
         bodyCollider = GetComponent<CircleCollider2D>();
         if (bodyCollider == null) bodyCollider = gameObject.AddComponent<CircleCollider2D>();
         bodyCollider.isTrigger = true;
@@ -30,7 +31,7 @@ public partial class PondOrganism
             if (renderer != null) renderer.sortingOrder = body.sortingOrder + 2;
         }
     }
-    //越靠下越靠前，且始终显示在水面上方。
+    //down = front
     void UpdateVisualDepth() => visualGroup.sortingOrder = 1000 - Mathf.RoundToInt(transform.position.y * 100);
     public void DriftAway(Vector3 heading)
     {
@@ -63,7 +64,7 @@ public partial class PondOrganism
         float radius = CollisionRadius;
         return new Vector3(Mathf.Clamp(position.x, TidepoolEvolution.Left + radius, TidepoolEvolution.Right - radius), Mathf.Clamp(position.y, TidepoolEvolution.Bottom + radius, TidepoolEvolution.Top - radius), 0);
     }
-    //把一帧拆成小步，防止倍速时穿过身体或卡进墙里。
+    //split the frame to avoid stuck
     void MoveWithSeparation(float duration)
     {
         int steps = Mathf.Max(1, Mathf.CeilToInt(duration / .025f));
@@ -79,7 +80,7 @@ public partial class PondOrganism
             foreach (var other in pond.population)
             {
                 if (other == null || other == this || other.dead) continue;
-                //藻类只避让藻类，不妨碍虾靠近进食。
+                //algae avoids algae
                 if ((species == TidepoolEvolution.Species.Algae) != (other.species == TidepoolEvolution.Species.Algae)) continue;
                 Vector3 gap = next - other.transform.position;
                 float distance = gap.magnitude;
@@ -88,7 +89,8 @@ public partial class PondOrganism
                 Vector3 normal = distance > .0001f ? gap / distance : (GetInstanceID() < other.GetInstanceID() ? Vector3.left : Vector3.right);
                 Vector3 corrected = next + normal * (clearance - distance + .002f);
                 next = ClampBody(corrected);
-                //贴墙时让旁边的生物让出空间，避免小虾被压在死角。
+                
+                //corner management
                 float blocked = Mathf.Max(0, Vector3.Dot(corrected - next, normal));
                 if (blocked > .0001f)
                     other.transform.position = other.ClampBody(other.transform.position - normal * (blocked + .005f));
